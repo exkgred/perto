@@ -56,6 +56,7 @@ async function boot() {
     const fontes = await response.json();
     const ativas = ["OpenStreetMap"];
     if (fontes.google) ativas.unshift("Google Places");
+    if (fontes.tavily) ativas.push("Tavily");
     if (fontes.brave) ativas.push("Brave");
     fontesEl.textContent = fontes.cohere
       ? `Fontes ligadas: ${ativas.join(", ")}.`
@@ -231,13 +232,29 @@ function renderCard(card) {
     rota.textContent = "Como chegar";
     actions.append(rota);
   }
+  if (card.instagram) {
+    const instagram = document.createElement("a");
+    instagram.href = card.instagram;
+    instagram.target = "_blank";
+    instagram.rel = "noreferrer";
+    instagram.textContent = "Instagram";
+    actions.append(instagram);
+  }
   if (card.url) {
     const link = document.createElement("a");
     link.href = card.url;
     link.target = "_blank";
     link.rel = "noreferrer";
-    link.textContent = card.kind === "link" ? "Abrir página" : "Ver no mapa";
+    link.textContent = card.kind === "link" ? "Abrir página" : card.url.includes("google.com/maps") ? "Ficha no Maps" : "Ver no mapa";
     actions.append(link);
+  }
+  if (card.kind !== "link" && card.lat != null && card.lon != null && !String(card.url || "").includes("google.com/maps")) {
+    const maps = document.createElement("a");
+    maps.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${card.name} ${card.lat},${card.lon}`)}`;
+    maps.target = "_blank";
+    maps.rel = "noreferrer";
+    maps.textContent = "Buscar no Maps";
+    actions.append(maps);
   }
   if (actions.childNodes.length) article.append(actions);
   const fonte = document.createElement("p");

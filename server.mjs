@@ -118,7 +118,7 @@ const server = createServer(async (request, response) => {
 server.listen(PORT, () => {
   const fontes = fontesAtivas();
   console.log(`Perto em http://localhost:${PORT}`);
-  console.log(`Fontes: Cohere ${fontes.cohere ? "sim" : "não"}, Google ${fontes.google ? "sim" : "não"}, Brave ${fontes.brave ? "sim" : "não"}, OpenStreetMap sim`);
+  console.log(`Fontes: Cohere ${fontes.cohere ? "sim" : "não"}, Google ${fontes.google ? "sim" : "não"}, Tavily ${fontes.tavily ? "sim" : "não"}, OpenStreetMap sim`);
 });
 
 async function loadEnv(file) {

@@ -27,18 +27,19 @@
 
     <main id="thread" class="thread" aria-live="polite">
       <section class="intro">
-        <p>Pede um lugar. A conversa fica com o Cohere; telefone, horário e “aberto agora” vêm da busca.</p>
+        <p>Pede qualquer coisa: comércio, encanador, diarista, pedreiro, aula particular. O card mostra só o que a fonte devolveu.</p>
         <div class="sugestoes">
-          <button type="button" data-sugestao="Borracharia aberta agora">Borracharia aberta agora</button>
-          <button type="button" data-sugestao="Farmácia 24 horas perto de mim">Farmácia 24 horas</button>
-          <button type="button" data-sugestao="Onde comprar sorvete de madrugada no iFood ou na 99">Sorvete de madrugada</button>
+          <button type="button" data-sugestao="Encanador em Almirante Tamandaré">Encanador</button>
+          <button type="button" data-sugestao="Diarista em Almirante Tamandaré">Diarista</button>
+          <button type="button" data-sugestao="Aula particular de inglês em Curitiba">Aula de inglês</button>
+          <button type="button" data-sugestao="Borracharia aberta agora em Almirante Tamandaré">Borracharia</button>
         </div>
       </section>
     </main>
 
     <form id="composer" class="composer">
       <label class="sr" for="mensagem">Mensagem</label>
-      <textarea id="mensagem" rows="1" placeholder="Ex.: borracheiro aberto de madrugada" required></textarea>
+      <textarea id="mensagem" rows="1" placeholder="Ex.: pedreiro, diarista, aula de inglês" required></textarea>
       <button type="submit">Buscar</button>
     </form>
     <script src="/app.js" type="module"></script>
