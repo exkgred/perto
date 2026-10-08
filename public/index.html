@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#143d2c" />
+    <meta name="description" content="Acha comércio por perto e mostra a fonte de cada resultado." />
+    <title>Perto</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <img src="/icon.svg" alt="" width="36" height="36" />
+        <div>
+          <h1>Perto</h1>
+          <p>O card só mostra o que a fonte devolveu.</p>
+        </div>
+      </div>
+      <button id="loc-btn" type="button">Usar minha localização</button>
+      <p id="loc-status" class="status">Sem GPS. Dá para buscar dizendo a cidade.</p>
+      <p id="fontes" class="fontes"></p>
+    </header>
+
+    <main id="thread" class="thread" aria-live="polite">
+      <section class="intro">
+        <p>Pede um lugar. A conversa fica com o Cohere; telefone, horário e “aberto agora” vêm da busca.</p>
+        <div class="sugestoes">
+          <button type="button" data-sugestao="Borracharia aberta agora">Borracharia aberta agora</button>
+          <button type="button" data-sugestao="Farmácia 24 horas perto de mim">Farmácia 24 horas</button>
+          <button type="button" data-sugestao="Onde comprar sorvete de madrugada no iFood ou na 99">Sorvete de madrugada</button>
+        </div>
+      </section>
+    </main>
+
+    <form id="composer" class="composer">
+      <label class="sr" for="mensagem">Mensagem</label>
+      <textarea id="mensagem" rows="1" placeholder="Ex.: borracheiro aberto de madrugada" required></textarea>
+      <button type="submit">Buscar</button>
+    </form>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
