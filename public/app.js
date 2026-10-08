@@ -280,12 +280,6 @@ function renderCard(card) {
   const title = document.createElement("h3");
   title.textContent = card.name;
   titleWrap.append(title);
-  if (card.commerceType) {
-    const tipo = document.createElement("p");
-    tipo.className = "tipo";
-    tipo.textContent = card.commerceType;
-    titleWrap.append(tipo);
-  }
   header.append(titleWrap);
   if (card.distanceMeters != null) {
     const dist = document.createElement("p");
@@ -293,9 +287,19 @@ function renderCard(card) {
     dist.textContent = formatarDistancia(card.distanceMeters);
     header.append(dist);
   }
-  article.append(header, badge(card));
+  article.append(header);
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  if (card.commerceType) {
+    const tipo = document.createElement("p");
+    tipo.className = "tipo";
+    tipo.textContent = card.commerceType;
+    chips.append(tipo);
+  }
+  chips.append(badge(card));
+  article.append(chips);
   if (card.sells) {
-    article.append(linha("oferta", `Em geral: ${card.sells}. A fonte não confirma o estoque.`));
+    article.append(linha("oferta", `Costuma ter ${card.sells}.`));
   }
   if (card.address) article.append(linha("addr", card.address));
   if (card.snippet) article.append(linha("snippet", card.snippet));
@@ -305,8 +309,6 @@ function renderCard(card) {
   if (card.phone) {
     const tel = linkAcao(`tel:${card.phone.replace(/\s/g, "")}`, card.phone);
     actions.append(tel);
-  } else if (card.kind !== "link") {
-    article.append(linha("sem-fone", "Telefone não informado pela fonte"));
   }
   if (card.lat != null && card.lon != null) {
     const rota = linkAcao(`https://www.google.com/maps/dir/?api=1&destination=${card.lat},${card.lon}`, "Como chegar", true);
@@ -317,16 +319,17 @@ function renderCard(card) {
     actions.append(linkAcao(card.instagram, "Instagram", true));
   }
   if (card.url) {
-    const rotulo = card.kind === "link" ? "Abrir página" : card.url.includes("google.com/maps") ? "Ficha no Maps" : "Ver no mapa";
+    const rotulo = card.kind === "link" ? "Abrir" : card.url.includes("google.com/maps") ? "Maps" : "Mapa";
     actions.append(linkAcao(card.url, rotulo, true));
   }
-  if (card.kind !== "link" && card.lat != null && card.lon != null && !String(card.url || "").includes("google.com/maps")) {
-    const maps = linkAcao(
+  const temRota = card.lat != null && card.lon != null;
+  const urlEhMaps = String(card.url || "").includes("google.com/maps");
+  if (card.kind !== "link" && temRota && !urlEhMaps) {
+    actions.append(linkAcao(
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${card.name} ${card.lat},${card.lon}`)}`,
-      "Buscar no Maps",
+      "Maps",
       true,
-    );
-    actions.append(maps);
+    ));
   }
   if (actions.childNodes.length) article.append(actions);
   const fonte = document.createElement("p");

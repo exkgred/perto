@@ -192,7 +192,7 @@ button, a { touch-action: manipulation; }
   box-shadow: 0 1px 0 rgba(20, 61, 44, 0.06), 0 6px 16px rgba(20, 61, 44, 0.06);
 }
 
-.msg { margin-top: 12px; }
+.msg { margin-top: 12px; min-width: 0; max-width: 100%; }
 
 .msg p {
   margin: 0;
@@ -210,7 +210,7 @@ button, a { touch-action: manipulation; }
   padding: 10px 14px;
 }
 
-.assistant { max-width: 100%; }
+.assistant { max-width: 100%; min-width: 0; }
 
 .assistant .bubble {
   width: fit-content;
@@ -222,20 +222,24 @@ button, a { touch-action: manipulation; }
 
 .cards {
   display: grid;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 8px;
+  min-width: 0;
 }
 
 .card {
+  min-width: 0;
+  max-width: 100%;
   background: white;
-  border-radius: 18px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  overflow: hidden;
 }
 
 .card header {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   align-items: flex-start;
 }
 
@@ -243,37 +247,48 @@ button, a { touch-action: manipulation; }
 
 .card h3 {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 0.95rem;
   font-weight: 650;
   letter-spacing: -0.02em;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .tipo {
-  margin: 3px 0 0;
+  margin: 0;
   color: var(--pine);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
 .distancia {
   margin: 0;
   flex: none;
-  padding: 4px 8px;
+  padding: 2px 7px;
   border-radius: 999px;
   background: #e7f3ea;
   color: var(--deep);
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
 .badge {
   display: inline-flex;
-  margin-top: 8px;
+  margin: 0;
   border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.72rem;
+  padding: 2px 7px;
+  font-size: 0.68rem;
   font-weight: 600;
   background: #f3ead2;
   color: var(--sand);
@@ -286,38 +301,39 @@ button, a { touch-action: manipulation; }
 .card .addr,
 .card .meta,
 .card .snippet,
-.card .oferta,
-.card .sem-fone {
-  margin: 8px 0 0;
+.card .oferta {
+  margin: 4px 0 0;
   color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card .actions {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
 }
-
-.card .actions::-webkit-scrollbar { display: none; }
 
 .acao {
   display: inline-flex;
   align-items: center;
-  flex: none;
-  min-height: 36px;
-  padding: 6px 12px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 4px 10px;
   border-radius: 999px;
   background: #f3efe6;
   color: var(--deep);
-  font-size: 0.84rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .acao.primaria {
@@ -326,9 +342,12 @@ button, a { touch-action: manipulation; }
 }
 
 .fonte {
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   color: #8a978e;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pending {
