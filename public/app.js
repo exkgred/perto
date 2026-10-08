@@ -91,14 +91,14 @@ async function boot() {
   try {
     const response = await fetch("/api/status");
     const fontes = await response.json();
-    const ativas = ["OpenStreetMap"];
-    if (fontes.google) ativas.unshift("Google Places");
-    if (fontes.tavily) ativas.push("Tavily");
-    if (fontes.brave) ativas.push("Brave");
-    fontesEl.textContent = fontes.cohere
-      ? `Fontes ligadas: ${ativas.join(", ")}.`
-      : "Falta a chave do Cohere no servidor.";
+    if (fontes.cohere) {
+      fontesEl.hidden = true;
+    } else {
+      fontesEl.hidden = false;
+      fontesEl.textContent = "Falta a chave do Cohere no servidor.";
+    }
   } catch {
+    fontesEl.hidden = false;
     fontesEl.textContent = "Não consegui ler as fontes do servidor.";
   }
 }
@@ -170,12 +170,12 @@ function pedirLocalizacao() {
 function pintarLocal() {
   if (!state.location) {
     locBtn.dataset.on = "false";
-    locBtn.textContent = "Usar minha localização";
-    locStatus.textContent = "Sem GPS. Dá para buscar dizendo a cidade.";
+    locBtn.setAttribute("aria-label", "Usar minha localização");
+    locStatus.textContent = "Sem GPS. Diga a cidade.";
     return;
   }
   locBtn.dataset.on = "true";
-  locBtn.textContent = "Atualizar localização";
+  locBtn.setAttribute("aria-label", "Atualizar localização");
   const metros = state.location.accuracy;
   locStatus.textContent = !metros
     ? state.location.label
@@ -238,10 +238,10 @@ function render() {
   if (state.busy) {
     const pending = document.createElement("p");
     pending.className = "pending";
-    pending.textContent = "Procurando nas fontes…";
+    pending.textContent = "Procurando o mais perto…";
     thread.append(pending);
   }
-  thread.lastElementChild?.scrollIntoView({ block: "end" });
+  thread.scrollTop = thread.scrollHeight;
 }
 
 function blocoUsuario(message) {
@@ -275,61 +275,57 @@ function renderCard(card) {
   const article = document.createElement("article");
   article.className = "card";
   const header = document.createElement("header");
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "card-title";
   const title = document.createElement("h3");
   title.textContent = card.name;
-  header.append(title, badge(card));
-  article.append(header);
-  if (card.commerceType || card.sells) {
-    const tipo = card.commerceType ? `Tipo: ${card.commerceType}` : "";
-    const vende = card.sells ? `Em geral: ${card.sells}. A fonte não confirma o estoque.` : "";
-    article.append(linha("oferta", [tipo, vende].filter(Boolean).join(". ")));
+  titleWrap.append(title);
+  if (card.commerceType) {
+    const tipo = document.createElement("p");
+    tipo.className = "tipo";
+    tipo.textContent = card.commerceType;
+    titleWrap.append(tipo);
+  }
+  header.append(titleWrap);
+  if (card.distanceMeters != null) {
+    const dist = document.createElement("p");
+    dist.className = "distancia";
+    dist.textContent = formatarDistancia(card.distanceMeters);
+    header.append(dist);
+  }
+  article.append(header, badge(card));
+  if (card.sells) {
+    article.append(linha("oferta", `Em geral: ${card.sells}. A fonte não confirma o estoque.`));
   }
   if (card.address) article.append(linha("addr", card.address));
   if (card.snippet) article.append(linha("snippet", card.snippet));
-  const meta = [];
-  if (card.distanceMeters != null) meta.push(formatarDistancia(card.distanceMeters));
-  if (card.hours) meta.push(card.hours);
-  if (meta.length) article.append(linha("meta", meta.join(" · ")));
+  if (card.hours) article.append(linha("meta", card.hours));
   const actions = document.createElement("div");
   actions.className = "actions";
   if (card.phone) {
-    const tel = document.createElement("a");
-    tel.href = `tel:${card.phone.replace(/\s/g, "")}`;
-    tel.textContent = card.phone;
+    const tel = linkAcao(`tel:${card.phone.replace(/\s/g, "")}`, card.phone);
     actions.append(tel);
   } else if (card.kind !== "link") {
-    actions.append(linha("meta", "Telefone não informado pela fonte"));
+    article.append(linha("sem-fone", "Telefone não informado pela fonte"));
   }
   if (card.lat != null && card.lon != null) {
-    const rota = document.createElement("a");
-    rota.href = `https://www.google.com/maps/dir/?api=1&destination=${card.lat},${card.lon}`;
-    rota.target = "_blank";
-    rota.rel = "noreferrer";
-    rota.textContent = "Como chegar";
+    const rota = linkAcao(`https://www.google.com/maps/dir/?api=1&destination=${card.lat},${card.lon}`, "Como chegar", true);
+    rota.classList.add("primaria");
     actions.append(rota);
   }
   if (card.instagram) {
-    const instagram = document.createElement("a");
-    instagram.href = card.instagram;
-    instagram.target = "_blank";
-    instagram.rel = "noreferrer";
-    instagram.textContent = "Instagram";
-    actions.append(instagram);
+    actions.append(linkAcao(card.instagram, "Instagram", true));
   }
   if (card.url) {
-    const link = document.createElement("a");
-    link.href = card.url;
-    link.target = "_blank";
-    link.rel = "noreferrer";
-    link.textContent = card.kind === "link" ? "Abrir página" : card.url.includes("google.com/maps") ? "Ficha no Maps" : "Ver no mapa";
-    actions.append(link);
+    const rotulo = card.kind === "link" ? "Abrir página" : card.url.includes("google.com/maps") ? "Ficha no Maps" : "Ver no mapa";
+    actions.append(linkAcao(card.url, rotulo, true));
   }
   if (card.kind !== "link" && card.lat != null && card.lon != null && !String(card.url || "").includes("google.com/maps")) {
-    const maps = document.createElement("a");
-    maps.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${card.name} ${card.lat},${card.lon}`)}`;
-    maps.target = "_blank";
-    maps.rel = "noreferrer";
-    maps.textContent = "Buscar no Maps";
+    const maps = linkAcao(
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${card.name} ${card.lat},${card.lon}`)}`,
+      "Buscar no Maps",
+      true,
+    );
     actions.append(maps);
   }
   if (actions.childNodes.length) article.append(actions);
@@ -367,6 +363,18 @@ function badge(card) {
     span.textContent = "horário não informado";
   }
   return span;
+}
+
+function linkAcao(href, text, externo = false) {
+  const link = document.createElement("a");
+  link.className = "acao";
+  link.href = href;
+  link.textContent = text;
+  if (externo) {
+    link.target = "_blank";
+    link.rel = "noreferrer";
+  }
+  return link;
 }
 
 function linha(className, text) {
