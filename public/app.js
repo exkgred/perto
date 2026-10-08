@@ -111,7 +111,7 @@ function pedirLocalizacao() {
     return;
   }
   if (gpsWatch) navigator.geolocation.clearWatch(gpsWatch);
-  locStatus.textContent = "Ajustando o GPS…";
+  locStatus.textContent = "Pedindo a localização precisa do celular…";
   let best = null;
   let settled = false;
   const stop = () => {
@@ -145,7 +145,12 @@ function pedirLocalizacao() {
   gpsWatch = navigator.geolocation.watchPosition(
     (position) => {
       if (!best || position.coords.accuracy < best.coords.accuracy) best = position;
-      if (best.coords.accuracy <= 80) accept(best);
+      const margem = Math.round(best.coords.accuracy);
+      if (margem <= 80) {
+        accept(best);
+        return;
+      }
+      locStatus.textContent = `Ainda aproximado, erro de ${margem} m. Esperando o GPS do celular…`;
     },
     () => {
       if (best) accept(best);
@@ -159,7 +164,7 @@ function pedirLocalizacao() {
   );
   const giveUp = setTimeout(() => {
     if (best) accept(best);
-  }, 8000);
+  }, 20000);
 }
 
 function pintarLocal() {
@@ -172,12 +177,11 @@ function pintarLocal() {
   locBtn.dataset.on = "true";
   locBtn.textContent = "Atualizar localização";
   const metros = state.location.accuracy;
-  const precisao = !metros
-    ? ""
+  locStatus.textContent = !metros
+    ? state.location.label
     : metros > 200
-      ? ` · o GPS pode errar em até ${metros} m`
-      : ` · precisão ${metros} m`;
-  locStatus.textContent = `${state.location.label}${precisao}`;
+      ? `${state.location.label} · o celular mandou um ponto aproximado, com erro de até ${metros} m. Ative a localização precisa do navegador e toque em atualizar.`
+      : `${state.location.label} · precisão ${metros} m`;
 }
 
 async function enviar(text) {
