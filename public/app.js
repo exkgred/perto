@@ -88,6 +88,7 @@ boot();
 async function boot() {
   pintarLocal();
   render();
+  if (await localizacaoJaPermitida()) pedirLocalizacao();
   try {
     const response = await fetch("/api/status");
     const fontes = await response.json();
@@ -139,6 +140,7 @@ function pedirLocalizacao() {
       label,
       accuracy: Math.round(position.coords.accuracy),
     };
+    try { localStorage.setItem("perto-geo", "1"); } catch { /* navegador sem armazenamento */ }
     persist();
     pintarLocal();
   };
@@ -152,11 +154,14 @@ function pedirLocalizacao() {
       }
       locStatus.textContent = `Ainda aproximado, erro de ${margem} m. Esperando o GPS do celular…`;
     },
-    () => {
+    (error) => {
       if (best) accept(best);
       else {
         settled = true;
         stop();
+        if (error?.code === 1) {
+          try { localStorage.removeItem("perto-geo"); } catch { /* segue sem o lembrete */ }
+        }
         locStatus.textContent = "Localização bloqueada. Dá para buscar dizendo a cidade.";
       }
     },
@@ -165,6 +170,17 @@ function pedirLocalizacao() {
   const giveUp = setTimeout(() => {
     if (best) accept(best);
   }, 20000);
+}
+
+async function localizacaoJaPermitida() {
+  if (!navigator.geolocation) return false;
+  if (navigator.permissions?.query) {
+    try {
+      const status = await navigator.permissions.query({ name: "geolocation" });
+      return status.state === "granted";
+    } catch { /* alguns navegadores não respondem essa consulta */ }
+  }
+  try { return localStorage.getItem("perto-geo") === "1"; } catch { return false; }
 }
 
 function pintarLocal() {
@@ -230,6 +246,8 @@ function persist() {
 
 function render() {
   const intro = thread.querySelector(".intro");
+  const noFim = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 48;
+  const scrollTop = thread.scrollTop;
   thread.replaceChildren();
   if (!state.messages.length) thread.append(intro);
   for (const message of state.messages) {
@@ -241,7 +259,7 @@ function render() {
     pending.textContent = "Procurando o mais perto…";
     thread.append(pending);
   }
-  thread.scrollTop = thread.scrollHeight;
+  thread.scrollTop = noFim ? thread.scrollHeight : scrollTop;
 }
 
 function blocoUsuario(message) {

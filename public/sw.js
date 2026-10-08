@@ -1,4 +1,4 @@
-const CACHE = "perto-v6";
+const CACHE = "perto-v7";
 const SHELL = ["/", "/styles.css", "/app.js", "/icon.svg", "/icon-180.png", "/icon-192.png", "/icon-512.png", "/icon-maskable.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
