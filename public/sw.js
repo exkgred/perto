@@ -1,5 +1,5 @@
-const CACHE = "perto-v2";
-const SHELL = ["/", "/styles.css", "/app.js", "/icon.svg", "/manifest.webmanifest"];
+const CACHE = "perto-v3";
+const SHELL = ["/", "/styles.css", "/app.js", "/icon.svg", "/icon-180.png", "/icon-192.png", "/icon-512.png", "/icon-maskable.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

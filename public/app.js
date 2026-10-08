@@ -46,6 +46,43 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
+const atalho = document.querySelector("#atalho");
+const atalhoAjuda = document.querySelector("#atalho-ajuda");
+const atalhoTexto = document.querySelector("#atalho-texto");
+let deferredInstall = null;
+const instalado = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const celular = window.matchMedia("(max-width: 800px)").matches || /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+if (!instalado && celular) atalho.hidden = false;
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstall = event;
+  atalho.hidden = false;
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstall = null;
+  atalho.hidden = true;
+});
+
+atalho.addEventListener("click", async () => {
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    const escolha = await deferredInstall.userChoice;
+    deferredInstall = null;
+    if (escolha.outcome === "accepted") atalho.hidden = true;
+    return;
+  }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  atalhoTexto.textContent = ios
+    ? "No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início."
+    : "No menu do navegador, escolha Adicionar à tela inicial ou Instalar app.";
+  atalhoAjuda.showModal();
+});
+
+document.querySelector("#atalho-fechar").addEventListener("click", () => atalhoAjuda.close());
+
 boot();
 
 async function boot() {

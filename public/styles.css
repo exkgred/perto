@@ -33,9 +33,16 @@ body {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 16px 16px 12px;
+  padding: calc(16px + env(safe-area-inset-top)) 16px 12px;
   background: var(--deep);
   color: #f3f7f2;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .brand {
@@ -59,16 +66,19 @@ body {
 }
 
 #loc-btn,
+#atalho,
 .composer button,
-.sugestoes button {
+.sugestoes button,
+#atalho-fechar {
   border: 0;
   border-radius: 999px;
   font: inherit;
   cursor: pointer;
 }
 
-#loc-btn {
-  margin-top: 12px;
+#loc-btn,
+#atalho {
+  min-height: 44px;
   background: #f4efe2;
   color: var(--deep);
   padding: 8px 14px;
@@ -152,14 +162,18 @@ body {
 
 .card header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
   align-items: flex-start;
 }
 
-.card h3 {
+.card h3,
+.card .addr,
+.card .snippet {
   margin: 0;
   font-size: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .badge {
@@ -222,19 +236,49 @@ body {
 
 .composer textarea {
   flex: 1;
+  min-width: 0;
   resize: none;
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 10px 12px;
   font: inherit;
+  font-size: 16px;
   background: white;
   max-height: 120px;
 }
 
 .composer button {
+  min-height: 44px;
   background: var(--pine);
   color: white;
   padding: 0 16px;
+}
+
+#atalho-ajuda {
+  max-width: min(420px, calc(100% - 32px));
+  border: 0;
+  border-radius: 18px;
+  padding: 18px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+#atalho-ajuda p {
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+
+#atalho-fechar {
+  min-height: 44px;
+  background: var(--pine);
+  color: white;
+  padding: 8px 14px;
+}
+
+@media (max-width: 640px) {
+  .user { margin-left: 0; }
+  .assistant { margin-right: 0; }
+  .sugestoes button { min-height: 44px; }
 }
 
 .composer button:disabled {

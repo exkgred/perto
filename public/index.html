@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#143d2c" />
     <meta name="description" content="Acha comércio por perto e mostra a fonte de cada resultado." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Perto" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Perto</title>
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -20,7 +24,10 @@
           <p>O card só mostra o que a fonte devolveu.</p>
         </div>
       </div>
-      <button id="loc-btn" type="button">Usar minha localização</button>
+      <div class="acoes">
+        <button id="loc-btn" type="button">Usar minha localização</button>
+        <button id="atalho" type="button" hidden>Adicionar à tela inicial</button>
+      </div>
       <p id="loc-status" class="status">Sem GPS. Dá para buscar dizendo a cidade.</p>
       <p id="fontes" class="fontes"></p>
     </header>
@@ -42,6 +49,10 @@
       <textarea id="mensagem" rows="1" placeholder="Ex.: pedreiro, diarista, aula de inglês" required></textarea>
       <button type="submit">Buscar</button>
     </form>
+    <dialog id="atalho-ajuda">
+      <p id="atalho-texto"></p>
+      <button type="button" id="atalho-fechar">Entendi</button>
+    </dialog>
     <script src="/app.js" type="module"></script>
   </body>
 </html>
