@@ -103,38 +103,63 @@ async function boot() {
   }
 }
 
+let gpsWatch = 0;
+
 function pedirLocalizacao() {
   if (!navigator.geolocation) {
     locStatus.textContent = "Este navegador não entrega localização.";
     return;
   }
-  locStatus.textContent = "Pedindo a localização do aparelho…";
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      let label = "ponto do GPS";
-      try {
-        const response = await fetch(`/api/onde?lat=${lat}&lon=${lon}`);
-        const data = await response.json();
-        if (data.label) label = data.label;
-      } catch {
-        label = "GPS ativo";
-      }
-      state.location = {
-        lat,
-        lon,
-        label,
-        accuracy: Math.round(position.coords.accuracy),
-      };
-      persist();
-      pintarLocal();
+  if (gpsWatch) navigator.geolocation.clearWatch(gpsWatch);
+  locStatus.textContent = "Ajustando o GPS…";
+  let best = null;
+  let settled = false;
+  const stop = () => {
+    if (gpsWatch) navigator.geolocation.clearWatch(gpsWatch);
+    gpsWatch = 0;
+    clearTimeout(giveUp);
+  };
+  const accept = async (position) => {
+    if (settled) return;
+    settled = true;
+    stop();
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    let label = "ponto do GPS";
+    try {
+      const response = await fetch(`/api/onde?lat=${lat}&lon=${lon}`);
+      const data = await response.json();
+      if (data.label) label = data.label;
+    } catch {
+      label = "GPS ativo";
+    }
+    state.location = {
+      lat,
+      lon,
+      label,
+      accuracy: Math.round(position.coords.accuracy),
+    };
+    persist();
+    pintarLocal();
+  };
+  gpsWatch = navigator.geolocation.watchPosition(
+    (position) => {
+      if (!best || position.coords.accuracy < best.coords.accuracy) best = position;
+      if (best.coords.accuracy <= 80) accept(best);
     },
     () => {
-      locStatus.textContent = "Localização bloqueada. Dá para buscar dizendo a cidade.";
+      if (best) accept(best);
+      else {
+        settled = true;
+        stop();
+        locStatus.textContent = "Localização bloqueada. Dá para buscar dizendo a cidade.";
+      }
     },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 120000 },
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
   );
+  const giveUp = setTimeout(() => {
+    if (best) accept(best);
+  }, 8000);
 }
 
 function pintarLocal() {
@@ -146,7 +171,12 @@ function pintarLocal() {
   }
   locBtn.dataset.on = "true";
   locBtn.textContent = "Atualizar localização";
-  const precisao = state.location.accuracy ? ` · precisão ${state.location.accuracy} m` : "";
+  const metros = state.location.accuracy;
+  const precisao = !metros
+    ? ""
+    : metros > 200
+      ? ` · o GPS pode errar em até ${metros} m`
+      : ` · precisão ${metros} m`;
   locStatus.textContent = `${state.location.label}${precisao}`;
 }
 
