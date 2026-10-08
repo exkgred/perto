@@ -279,6 +279,11 @@ function renderCard(card) {
   title.textContent = card.name;
   header.append(title, badge(card));
   article.append(header);
+  if (card.commerceType || card.sells) {
+    const tipo = card.commerceType ? `Tipo: ${card.commerceType}` : "";
+    const vende = card.sells ? `Em geral: ${card.sells}. A fonte não confirma o estoque.` : "";
+    article.append(linha("oferta", [tipo, vende].filter(Boolean).join(". ")));
+  }
   if (card.address) article.append(linha("addr", card.address));
   if (card.snippet) article.append(linha("snippet", card.snippet));
   const meta = [];

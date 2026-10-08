@@ -191,7 +191,8 @@ body {
 
 .card .addr,
 .card .meta,
-.card .snippet {
+.card .snippet,
+.card .oferta {
   margin: 6px 0 0;
   color: var(--muted);
   font-size: 0.92rem;
